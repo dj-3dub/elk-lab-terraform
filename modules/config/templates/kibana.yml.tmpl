@@ -1,0 +1,7 @@
+# Kibana persistent config (mounted by Terraform)
+server.host: "0.0.0.0"
+
+# Encryption keys (must be stable across restarts/upgrades)
+xpack.security.encryptionKey: "${security_encryption_key}"
+xpack.encryptedSavedObjects.encryptionKey: "${eso_encryption_key}"
+xpack.reporting.encryptionKey: "${reporting_encryption_key}"

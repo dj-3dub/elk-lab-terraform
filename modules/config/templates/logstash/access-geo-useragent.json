@@ -1,0 +1,6 @@
+{
+  "processors": [
+    { "geoip": { "field": "clientip", "target_field": "geoip" } },
+    { "user_agent": { "field": "agent", "target_field": "user_agent" } }
+  ]
+}

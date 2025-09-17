@@ -1,0 +1,27 @@
+filebeat.inputs:
+  - type: filestream
+    id: docker-containers
+    enabled: true
+    paths:
+      - /var/lib/docker/containers/*/*-json.log
+    parsers:
+      - ndjson:
+          overwrite_keys: true
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+filebeat.modules:
+  - module: nginx
+    access:
+      enabled: true
+      var.paths: ["/host/var/log/nginx/access.log*"]
+    error:
+      enabled: true
+      var.paths: ["/host/var/log/nginx/error.log*"]
+
+setup.kibana:
+  host: "kibana:5601"
+
+setup.template.enabled: true
+setup.ilm.enabled: true

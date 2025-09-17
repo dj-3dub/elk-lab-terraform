@@ -1,0 +1,21 @@
+metricbeat.modules:
+  - module: system
+    period: 10s
+    metricsets: ["cpu","memory","network","filesystem","process"]
+    processes: ['.*']
+    enabled: true
+
+  - module: docker
+    period: 10s
+    hosts: ["unix:///var/run/docker.sock"]
+    enabled: true
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  username: "elastic"
+  password: "REPLACE_WITH_ELASTIC_PASSWORD"
+
+setup.kibana:
+  host: "kibana:5601"
+
+setup.ilm.enabled: true

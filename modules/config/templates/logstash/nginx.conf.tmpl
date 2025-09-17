@@ -1,0 +1,26 @@
+input {
+  beats { port => 5044 }
+}
+
+filter {
+  if [fileset][module] == "nginx" and [fileset][name] == "access" {
+    grok {
+      match => { "message" => "%%{IPORHOST:clientip} - %%{DATA:ident} %%{DATA:auth} \[%%{HTTPDATE:timestamp}\] \"%%{WORD:verb} %%{DATA:request}(?: HTTP/%%{NUMBER:httpversion})?\" %%{NUMBER:response} (?:%%{NUMBER:bytes}|-) \"%%{DATA:referrer}\" \"%%{DATA:agent}\"" }
+      remove_field => ["message"]
+    }
+    date { match => ["timestamp", "dd/MMM/YYYY:H:m:s Z"] }
+    useragent { source => "agent" target => "user_agent" }
+    geoip { source => "clientip" target => "geoip" }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts    => ["http://elasticsearch:9200"]
+    user     => "elastic"
+    password => "${elastic_password}"
+    index    => "nginx-access-%%{+YYYY.MM.dd}"
+    pipeline => "nginx_access_enrich"
+  }
+  stdout { codec => rubydebug }
+}
