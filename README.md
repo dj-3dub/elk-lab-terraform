@@ -32,6 +32,7 @@ terraform apply -var-file=envs/local.tfvars -var deploy_containers=true    # sta
 ## 🔭 Architecture
 <p align="center">
   <img src="docs/architecture.png" width="820" alt="Architecture diagram"/>
+_Build this image:_ `make diagram`
 </p>
 
 **Stack @ a glance**
@@ -101,6 +102,11 @@ make tf-fmt          # terraform fmt -recursive
 make tf-validate     # fmt + terraform validate
 ```
 
+```bash
+# tip: generate 32-byte hex keys for Kibana encryption keys
+openssl rand -hex 32
+```
+
 ---
 
 ## 🩺 Quick fixes
@@ -113,3 +119,6 @@ make tf-validate     # fmt + terraform validate
 ## 🔐 Note
 Lab stack; don’t expose 5601/9200 publicly. Prefer API keys for Beats/Logstash in prod.
 
+## Cleanup
+```bash
+terraform destroy -var-file=envs/local.tfvars
