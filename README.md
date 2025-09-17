@@ -1,100 +1,81 @@
-<!-- Banner -->
 <h1 align="center">ELK Lab on Docker with Terraform (.lab)</h1>
 <p align="center">
-  <b>Single-command homelab ELK stack — Elasticsearch, Kibana, Logstash, Beats — reproducible with Terraform.</b><br/>
-  <sub>Designed to run alongside k3s without fighting for ports.</sub>
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/IaC-Terraform-623CE4?logo=terraform&logoColor=white" />
-  <img src="https://img.shields.io/badge/Container-Docker-2496ED?logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/Containers-Docker-2496ED?logo=docker&logoColor=white" />
   <img src="https://img.shields.io/badge/Stack-ELK-005571?logo=elastic&logoColor=white" />
   <img src="https://img.shields.io/badge/OS-Debian-A81D33?logo=debian&logoColor=white" />
-  <img src="https://img.shields.io/badge/License-MIT-000000" />
 </p>
+
+<p align="center"><b>Single-node Elasticsearch + Kibana + Logstash + Beats</b> — reproducible with Terraform. Plays nice with k3s (no host 80/443).</p>
 
 ---
 
-## TL;DR (10s)
+## ⚡ TL;DR
 ```bash
 terraform init
-terraform apply -var-file=envs/local.tfvars -var deploy_containers=false  # render configs
-terraform apply -var-file=envs/local.tfvars -var deploy_containers=true   # start containers
+terraform apply -var-file=envs/local.tfvars -var deploy_containers=false   # render configs
+terraform apply -var-file=envs/local.tfvars -var deploy_containers=true    # start stack
 # Kibana → http://<vm-ip>:5601  (user: elastic / password from tfvars)
 ```
+---
+
+## What this demonstrates
+- 🏗️ IaC (Terraform): modular Docker network/images/containers
+- 🔐 Secure defaults: ES auth on; Kibana encryption keys (persisted)
+- 🔭 Observability: Filebeat & Metricbeat → Logstash → ES (geoip + user-agent)
+- ☸️ Platform-aware: k3s-friendly (no host 80/443)
+- 🧼 Ops hygiene: one-shot bootstrap; Git-safe layout
+- 🗺️ Clarity: Graphviz diagram + Make targets
 
 ---
 
-## What this proves about me
-- **Infrastructure as Code**: Modular Terraform for Docker networking, volumes, images, and containers.
-- **Secure defaults**: ES security enabled, Kibana **persistent encryption keys** via mounted `kibana.yml`.
-- **Observability plumbing**: Filebeat + Metricbeat → Logstash → Elasticsearch with **ingest pipeline** (geoIP + user-agent).
-- **Platform awareness**: Designed to **coexist with k3s** (no host port 80/443 bindings by default).
-- **Operational hygiene**: One-shot automation script, Git-safe layout (no secrets/state committed).
-- **Readable docs**: Architecture diagram (Graphviz) + Makefile targets.
-
-> Copy-ready resume bullets:
-> - Built a Terraform-driven ELK stack (Docker) with secure defaults, persistent Kibana encryption keys, and Beats → Logstash → ES ingest pipeline (geoIP/UA) for nginx access logs.  
-> - Productionized developer UX with one-shot bootstrap script, Makefile, and diagrams; designed to run alongside k3s without port conflicts.
-
----
-
-## Screenshots
+## 🔭 Architecture
 <p align="center">
-  <img src="docs/architecture.png" width="720" alt="Architecture diagram"/>
+  <img src="docs/architecture.png" width="820" alt="Architecture diagram"/>
 </p>
 
-> Optional: add a dashboard screenshot here (e.g., `docs/kibana-dashboard.png`) to show geo map, 2xx/4xx trends, top paths, and container metrics.
+**Stack @ a glance**
 
----
+| Component    | Purpose                               | Port(s) | Notes |
+|---|---|---:|---|
+| Elasticsearch | Data store + ingest                   | 9200    | Security on |
+| Kibana       | UI + apps                              | 5601    | Mounted `kibana.yml` with encryption keys |
+| Logstash     | Parse/enrich nginx access logs         | 5044    | Uses ingest pipeline (geoip + UA) |
+| Filebeat     | Ship container & host logs → Logstash  | —       | Binds `/var/log`, docker logs |
+| Metricbeat   | System & Docker metrics → ES           | —       | Docker socket read-only |
+| Caddy        | Optional reverse proxy                 | —       | No host 80/443 by default |
 
-## Architecture
-- **Elasticsearch** (single node, secured) with persistent volume  
-- **Kibana** with mounted `kibana.yml` (encryption keys persisted)  
-- **Logstash** nginx pipeline → **ingest pipeline** (geoip/user-agent)  
-- **Filebeat**: container + host logs  
-- **Metricbeat**: system + docker metrics  
-- **Caddy** reverse proxy (optional, no host ports published by default)
-
-Generate the diagram:
+Generate diagram:
 ```bash
 make install-graphviz
-make diagram     # builds docs/architecture.{png,svg} from docs/architecture.dot
+make diagram
 ```
 
 ---
 
-## Repo layout
+## 🧩 Features
+- Terraform modules for Docker network, images, containers
+- Secure defaults: Kibana **persistent** encryption keys
+- Ingest pipeline with **geoip** + **user-agent** enrich
+- k3s-friendly (no host 80/443 binding)
+- Git-safe layout: no secrets/state committed
+
+---
+
+## 📂 Layout (minimal)
 ```
-.
-├── envs/                     # local secrets & settings (ignored)
-│   └── local.tfvars
-├── modules/
-│   ├── config/               # renders to ./rendered/*
-│   └── docker-elk/           # docker network, images, containers
-├── rendered/                 # generated configs (ignored)
-├── main.tf  variables.tf  providers.tf  outputs.tf
-└── docs/architecture.dot     # Graphviz source
+modules/{config, docker-elk}/
+envs/                # local.tfvars (ignored)
+rendered/            # generated configs (ignored)
+docs/architecture.dot
 ```
 
 ---
 
-## Prereqs
-- Debian/Ubuntu VM with **Docker** & **Terraform**  
-- `vm.max_map_count = 262144`  
-- `graphviz` (for diagram)
-
+## 🚀 Quickstart (vars)
 ```bash
-# One-time if ES complains about vm.max_map_count
-echo 'vm.max_map_count=262144' | sudo tee /etc/sysctl.d/99-elastic.conf && sudo sysctl --system
-```
-
----
-
-## Quickstart
-```bash
-# 1) create your local vars (use strong secrets)
-cat > envs/local.tfvars <<'EOF'
+mkdir -p envs
+cat > envs/local.tfvars <<'VARS'
 project_name = "elk-lab"
 domain       = "elk.lab"
 docker_host  = "unix:///var/run/docker.sock"
@@ -108,42 +89,27 @@ kibana_system_password  = "ChangeMe_Kibana"
 kibana_security_encryption_key  = "GENERATE_ME"
 kibana_eso_encryption_key       = "GENERATE_ME"
 kibana_reporting_encryption_key = "GENERATE_ME"
-EOF
-
-# 2) init + render configs, then launch
-terraform init
-terraform apply -var-file=envs/local.tfvars -var deploy_containers=false
-terraform apply -var-file=envs/local.tfvars -var deploy_containers=true
-
-# 3) open kibana
-# http://<vm-ip>:5601  (user: elastic / password from tfvars)
+VARS
 ```
 
 ---
 
-## Troubleshooting (fast)
-- **Kibana “server not ready yet”** → reset passwords inside ES, then `docker restart <project>-kibana`.
-- **Port 80 busy (k3s)** → Caddy has no host port mapping by default; use `:5601` directly, or remap to 8080/8443.
-- **Changed passwords** → update `envs/local.tfvars`, re-render (`deploy_containers=false`), restart Logstash/Metricbeat.
-
----
-
-## Make targets
+## 🧰 Make targets
 ```bash
-make diagram            # build PNG+SVG from docs/architecture.dot
-make tf-fmt             # terraform fmt -recursive
-make tf-validate        # fmt + terraform validate
+make diagram         # build docs/architecture.{png,svg}
+make tf-fmt          # terraform fmt -recursive
+make tf-validate     # fmt + terraform validate
 ```
 
 ---
 
-## Security notes
-Lab stack; don’t expose 5601/9200 publicly. Keep `envs/` & `rendered/` out of Git. Prefer API keys for Beats/Logstash in prod.
+## 🩺 Quick fixes
+- Kibana “not ready” → reset `elastic` & `kibana_system` in ES, restart Kibana.
+- vm.max_map_count → `echo 'vm.max_map_count=262144' | sudo tee /etc/sysctl.d/99-elastic.conf && sudo sysctl --system`
+- Changed passwords → update `envs/local.tfvars`, re-render (deploy_containers=false), restart Logstash/Metricbeat.
 
 ---
 
-## Roadmap
-- [ ] GitHub Action: `terraform fmt` + `validate` on PRs
-- [ ] Beats/Logstash → **API keys** (least-privilege)
-- [ ] Sample dashboards + scripted demo traffic
-- [ ] Optional k3s Ingress instead of Caddy
+## 🔐 Note
+Lab stack; don’t expose 5601/9200 publicly. Prefer API keys for Beats/Logstash in prod.
+
