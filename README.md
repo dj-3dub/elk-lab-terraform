@@ -32,7 +32,7 @@ terraform apply -var-file=envs/local.tfvars -var deploy_containers=true    # sta
 ## 🔭 Architecture
 <p align="center">
   <img src="docs/architecture.png" width="820" alt="Architecture diagram"/>
-_Build this image:_ `make diagram`
+Build this image: `make diagram`
 </p>
 
 **Stack @ a glance**
