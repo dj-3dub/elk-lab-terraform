@@ -1,0 +1,45 @@
+digraph elk_lab {
+  rankdir=LR;
+  fontname="Inter,Helvetica,Arial";
+  node [shape=box, style="rounded,filled", fillcolor="#f8f9fb", fontname="Inter,Helvetica,Arial"];
+  edge [fontname="Inter,Helvetica,Arial"];
+
+  user [shape=oval, style=filled, fillcolor="#e6f7ff", label="User browser"];
+
+  subgraph cluster_host {
+    label="Debian VM (Docker host)";
+    color="#d0d7de";
+    style="rounded";
+
+    subgraph cluster_net {
+      label="Docker network: <project>-net";
+      color="#e5e7eb";
+      style="rounded";
+
+      es         [label="Elasticsearch (9200)\nVolume: es-data"];
+      kibana     [label="Kibana (5601)\nMounted: kibana.yml"];
+      logstash   [label="Logstash (5044)\nnginx access pipeline"];
+      filebeat   [label="Filebeat\ncontainer & host logs"];
+      metricbeat [label="Metricbeat\nsystem + docker"];
+      caddy      [label="Caddy (optional)\n(no 80/443 publish by default)"];
+    }
+
+    containers_dir [shape=folder, label="/var/lib/docker/containers/*"];
+    docker_sock    [shape=folder, label="/var/run/docker.sock"];
+    varlog         [shape=folder, label="/var/log/nginx/*"];
+  }
+
+  filebeat -> logstash [label="beats:5044"];
+  logstash -> es [label="ingest pipeline\nnginx_access_enrich"];
+  metricbeat -> es [label="metrics"];
+  kibana -> es [label="HTTP 9200\n(kibana_system)"];
+
+  user -> caddy [label="HTTP 80/443"];
+  caddy -> kibana [label="reverse_proxy 5601"];
+  user -> kibana [style=dashed, color="#9aa0a6", label="HTTP 5601 (direct)"];
+
+  filebeat -> containers_dir [style=dotted, color="#9aa0a6", label="bind ro"];
+  filebeat -> varlog         [style=dotted, color="#9aa0a6", label="bind ro"];
+  filebeat -> docker_sock    [style=dotted, color="#9aa0a6", label="bind ro"];
+  metricbeat -> docker_sock  [style=dotted, color="#9aa0a6", label="bind ro"];
+}
