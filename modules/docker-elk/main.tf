@@ -74,6 +74,14 @@ resource "docker_container" "elasticsearch" {
     external = 9200
   }
 
+  healthcheck {
+    test         = ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+    interval     = "30s"
+    timeout      = "10s"
+    retries      = 5
+    start_period = "60s"
+  }
+
   restart = "unless-stopped"
 }
 
@@ -106,6 +114,14 @@ resource "docker_container" "kibana" {
     external = 5601
   }
 
+  healthcheck {
+    test         = ["CMD-SHELL", "curl -fs http://localhost:5601/api/status || exit 1"]
+    interval     = "30s"
+    timeout      = "10s"
+    retries      = 5
+    start_period = "90s"
+  }
+
   restart = "unless-stopped"
 }
 
@@ -129,6 +145,14 @@ resource "docker_container" "logstash" {
   ports {
     internal = 5044
     external = 5044
+  }
+
+  healthcheck {
+    test         = ["CMD-SHELL", "curl -fs http://localhost:9600/_node/pipelines || exit 1"]
+    interval     = "30s"
+    timeout      = "10s"
+    retries      = 5
+    start_period = "60s"
   }
 
   depends_on = [docker_container.elasticsearch]
