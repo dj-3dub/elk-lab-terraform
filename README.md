@@ -3,122 +3,254 @@
   <img src="https://img.shields.io/badge/IaC-Terraform-623CE4?logo=terraform&logoColor=white" />
   <img src="https://img.shields.io/badge/Containers-Docker-2496ED?logo=docker&logoColor=white" />
   <img src="https://img.shields.io/badge/Stack-ELK-005571?logo=elastic&logoColor=white" />
+  <img src="https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?logo=githubactions&logoColor=white" />
   <img src="https://img.shields.io/badge/OS-Debian-A81D33?logo=debian&logoColor=white" />
 </p>
 
-<p align="center"><b>Single-node Elasticsearch + Kibana + Logstash + Beats</b> — reproducible with Terraform. Plays nice with k3s (no host 80/443).</p>
+<p align="center"><b>Production-inspired observability lab built with Terraform, Docker, Elasticsearch, Kibana, Logstash, Filebeat, and Metricbeat.</b></p>
 
 ---
 
-## ⚡ TL;DR
+# Overview
+
+This project demonstrates how to deploy and operate a complete ELK observability stack using Infrastructure as Code principles.
+
+Key concepts demonstrated:
+
+- Terraform Infrastructure as Code
+- Modular Terraform design
+- Docker container orchestration
+- Centralized logging and ingestion
+- Infrastructure monitoring with Metricbeat
+- GitHub Actions CI/CD
+- TFLint static analysis
+- Checkov security scanning
+- Docker health checks
+- Architecture documentation
+- Operational runbooks
+- Demo log generation
+
+---
+
+# Project Highlights
+
+✅ Terraform Infrastructure as Code
+
+✅ Modular Terraform modules
+
+✅ Elasticsearch, Kibana, Logstash, Filebeat, and Metricbeat
+
+✅ GitHub Actions CI pipeline
+
+✅ Terraform validation and formatting enforcement
+
+✅ TFLint static analysis
+
+✅ Checkov security scanning
+
+✅ Docker container health checks
+
+✅ Log enrichment with GeoIP and User-Agent processing
+
+✅ Runbook-driven operations
+
+✅ Architecture diagrams
+
+✅ Demo data generation tooling
+
+---
+
+# Quick Start
+
 ```bash
+cp terraform.tfvars.example terraform.tfvars
+
+# Update passwords and environment settings
+nano terraform.tfvars
+
 terraform init
-terraform apply -var-file=envs/local.tfvars -var deploy_containers=false   # render configs
-terraform apply -var-file=envs/local.tfvars -var deploy_containers=true    # start stack
-# Kibana → http://<vm-ip>:5601  (user: elastic / password from tfvars)
+terraform plan
+terraform apply
 ```
----
 
-## What this demonstrates
-- 🏗️ IaC (Terraform): modular Docker network/images/containers
-- 🔐 Secure defaults: ES auth on; Kibana encryption keys (persisted)
-- 🔭 Observability: Filebeat & Metricbeat → Logstash → ES (geoip + user-agent)
-- ☸️ Platform-aware: k3s-friendly (no host 80/443)
-- 🧼 Ops hygiene: one-shot bootstrap; Git-safe layout
-- 🗺️ Clarity: Graphviz diagram + Make targets
+Access Kibana:
+
+```text
+http://<server-ip>:5601
+```
 
 ---
 
-## 🔭 Architecture
+# Architecture
+
 <p align="center">
-  <img src="docs/architecture.png" width="820" alt="Architecture diagram"/>
-Build this image: `make diagram`
+  <img src="docs/architecture.png" width="850" alt="Architecture Diagram"/>
 </p>
 
-**Stack @ a glance**
+The stack consists of:
 
-| Component    | Purpose                               | Port(s) | Notes |
-|---|---|---:|---|
-| Elasticsearch | Data store + ingest                   | 9200    | Security on |
-| Kibana       | UI + apps                              | 5601    | Mounted `kibana.yml` with encryption keys |
-| Logstash     | Parse/enrich nginx access logs         | 5044    | Uses ingest pipeline (geoip + UA) |
-| Filebeat     | Ship container & host logs → Logstash  | —       | Binds `/var/log`, docker logs |
-| Metricbeat   | System & Docker metrics → ES           | —       | Docker socket read-only |
-| Caddy        | Optional reverse proxy                 | —       | No host 80/443 by default |
+| Component | Purpose |
+|------------|----------|
+| Elasticsearch | Search, indexing, and storage |
+| Kibana | Visualization and analytics |
+| Logstash | Parsing and enrichment |
+| Filebeat | Log collection |
+| Metricbeat | Infrastructure metrics |
+| Terraform | Infrastructure provisioning |
+| Docker | Container runtime |
 
-Generate diagram:
+---
+
+# Screenshots
+
+## Kibana Dashboard
+
+![Kibana Dashboard](docs/screenshots/kibana-dashboard.png)
+
+## Kibana Discover
+
+![Kibana Discover](docs/screenshots/kibana-discover.png)
+
+## Metricbeat Host Metrics
+
+![Metricbeat Host Metrics](docs/screenshots/metricbeat-host-overview.png)
+
+## Container Health Monitoring
+
+![Container Health](docs/screenshots/docker-healthy-containers.png)
+
+---
+
+# CI/CD
+
+GitHub Actions automatically validates infrastructure changes.
+
+Validation pipeline includes:
+
+- terraform fmt
+- terraform validate
+- TFLint
+- Checkov security scanning
+
+This helps prevent configuration drift and catches issues before deployment.
+
+---
+
+# Security
+
+Security-focused improvements include:
+
+- Sensitive Terraform variables
+- No production secrets committed to Git
+- Example tfvars template
+- Checkov security scanning
+- Health monitoring
+- Docker network isolation
+
+For production environments, API keys should be preferred over passwords where possible.
+
+---
+
+# Demo Log Generation
+
+Generate realistic web access logs:
+
 ```bash
-make install-graphviz
-make diagram
+./scripts/generate-nginx-logs.sh
+```
+
+The generated logs can be ingested into Logstash and visualized through Kibana dashboards.
+
+---
+
+# Operations Runbooks
+
+Operational documentation is provided under:
+
+```text
+docs/runbooks/troubleshooting.md
+```
+
+Covered scenarios include:
+
+- Kibana unavailable
+- Elasticsearch health issues
+- Log ingestion failures
+- Password rotation
+- Full stack rebuild procedures
+
+---
+
+# Repository Layout
+
+```text
+.
+├── .github/workflows/
+├── docs/
+│   ├── architecture.*
+│   ├── runbooks/
+│   └── screenshots/
+├── modules/
+│   ├── config/
+│   └── docker-elk/
+├── scripts/
+├── terraform.tfvars.example
+├── main.tf
+├── variables.tf
+└── outputs.tf
 ```
 
 ---
 
-## 🧩 Features
-- Terraform modules for Docker network, images, containers
-- Secure defaults: Kibana **persistent** encryption keys
-- Ingest pipeline with **geoip** + **user-agent** enrich
-- k3s-friendly (no host 80/443 binding)
-- Git-safe layout: no secrets/state committed
+# Troubleshooting
 
----
-
-## 📂 Layout (minimal)
-```
-modules/{config, docker-elk}/
-envs/                # local.tfvars (ignored)
-rendered/            # generated configs (ignored)
-docs/architecture.dot
-```
-
----
-
-## 🚀 Quickstart (vars)
-```bash
-mkdir -p envs
-cat > envs/local.tfvars <<'VARS'
-project_name = "elk-lab"
-domain       = "elk.lab"
-docker_host  = "unix:///var/run/docker.sock"
-stack_version = "8.15.0"
-es_java_opts  = "-Xms2g -Xmx2g"
-
-elastic_password        = "ChangeMe_Elastic"
-kibana_system_password  = "ChangeMe_Kibana"
-
-# Kibana encryption keys (persist!)
-kibana_security_encryption_key  = "GENERATE_ME"
-kibana_eso_encryption_key       = "GENERATE_ME"
-kibana_reporting_encryption_key = "GENERATE_ME"
-VARS
-```
-
----
-
-## 🧰 Make targets
-```bash
-make diagram         # build docs/architecture.{png,svg}
-make tf-fmt          # terraform fmt -recursive
-make tf-validate     # fmt + terraform validate
-```
+Check container status:
 
 ```bash
-# tip: generate 32-byte hex keys for Kibana encryption keys
-openssl rand -hex 32
+docker ps
+```
+
+Check Elasticsearch health:
+
+```bash
+curl http://localhost:9200/_cluster/health
+```
+
+Check Kibana:
+
+```bash
+curl http://localhost:5601/api/status
+```
+
+Review container logs:
+
+```bash
+docker logs elasticsearch
+docker logs kibana
+docker logs logstash
 ```
 
 ---
 
-## 🩺 Quick fixes
-- Kibana “not ready” → reset `elastic` & `kibana_system` in ES, restart Kibana.
-- vm.max_map_count → `echo 'vm.max_map_count=262144' | sudo tee /etc/sysctl.d/99-elastic.conf && sudo sysctl --system`
-- Changed passwords → update `envs/local.tfvars`, re-render (deploy_containers=false), restart Logstash/Metricbeat.
+# Cleanup
+
+```bash
+terraform destroy
+```
 
 ---
 
-## 🔐 Note
-Lab stack; don’t expose 5601/9200 publicly. Prefer API keys for Beats/Logstash in prod.
+# Future Enhancements
 
-## Cleanup
-```bash
-terraform destroy -var-file=envs/local.tfvars
+Potential future improvements:
+
+- TLS-enabled deployment
+- API-key authentication
+- Kubernetes deployment option
+- Elasticsearch snapshot automation
+- Alerting integrations
+- Grafana integration
+
+---
+
+Built as a portfolio project to demonstrate modern Infrastructure Engineering, Platform Engineering, and Observability practices.
