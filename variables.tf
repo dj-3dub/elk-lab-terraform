@@ -19,15 +19,15 @@ variable "stack_version" {
 }
 
 variable "elastic_password" {
-  type      = string
-  sensitive = true
-  default   = "ChangeMe_Elastic"
+  description = "Password for the built-in elastic superuser."
+  type        = string
+  sensitive   = true
 }
 
 variable "kibana_system_password" {
-  type      = string
-  sensitive = true
-  default   = "ChangeMe_Kibana"
+  description = "Password for the built-in kibana_system user."
+  type        = string
+  sensitive   = true
 }
 
 variable "es_java_opts" {

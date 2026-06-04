@@ -4,9 +4,8 @@ elastic_version = "8.13.4"
 
 deploy_containers = false
 
-elasticsearch_password = "ChangeMe_Elastic"
-kibana_password        = "ChangeMe_Kibana"
-logstash_password      = "ChangeMe_Logstash"
+elastic_password       = "REPLACE_WITH_SECURE_ELASTIC_PASSWORD"
+kibana_system_password = "REPLACE_WITH_SECURE_KIBANA_SYSTEM_PASSWORD"
 
 elasticsearch_port = 9200
 kibana_port        = 5601

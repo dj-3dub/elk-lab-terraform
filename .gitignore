@@ -6,6 +6,7 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+!terraform.tfvars.example
 
 envs/
 *.tfvars
@@ -18,3 +19,4 @@ rendered/
 .DS_Store
 *.zip
 *.log
+demo-nginx-access.log
