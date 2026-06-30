@@ -75,7 +75,7 @@ resource "docker_container" "elasticsearch" {
   }
 
   healthcheck {
-    test         = ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+    test         = ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
     interval     = "30s"
     timeout      = "10s"
     retries      = 5
@@ -104,7 +104,7 @@ resource "docker_container" "kibana" {
     "ELASTICSEARCH_HOSTS=[\"http://elasticsearch:9200\"]",
     "ELASTICSEARCH_USERNAME=kibana_system",
     "ELASTICSEARCH_PASSWORD=${var.kibana_system_password}",
-    "SERVER_PUBLICBASEURL=http://elk.lab:5601"
+    "SERVER_PUBLICBASEURL=http://${var.domain}:5601"
   ]
 
   depends_on = [docker_container.elasticsearch]

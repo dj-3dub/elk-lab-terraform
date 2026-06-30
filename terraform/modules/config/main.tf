@@ -67,8 +67,25 @@ resource "local_file" "kibana_yml" {
 }
 
 # ----- Outputs for docker module -----
-output "filebeat_path" { value = "${local.render_dir}/filebeat" }
-output "metricbeat_path" { value = "${local.render_dir}/metricbeat" }
-output "logstash_path" { value = "${local.render_dir}/logstash" }
-output "caddyfile_path" { value = "${local.render_dir}/reverse-proxy/Caddyfile" }
-output "kibana_config_path" { value = "${local.render_dir}/kibana/kibana.yml" }
+output "filebeat_path" {
+  value = "${local.render_dir}/filebeat"
+}
+
+output "metricbeat_path" {
+  value     = "${local.render_dir}/metricbeat"
+  sensitive = true
+}
+
+output "logstash_path" {
+  value     = "${local.render_dir}/logstash/pipelines.d"
+  sensitive = true
+}
+
+output "caddyfile_path" {
+  value = "${local.render_dir}/reverse-proxy/Caddyfile"
+}
+
+output "kibana_config_path" {
+  value     = "${local.render_dir}/kibana/kibana.yml"
+  sensitive = true
+}

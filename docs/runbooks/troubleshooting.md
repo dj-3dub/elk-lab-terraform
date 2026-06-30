@@ -1,4 +1,4 @@
-# ELK Lab Troubleshooting Runbook
+# ELK Observability Platform Troubleshooting Runbook
 
 ## 1. Verify containers are running
 

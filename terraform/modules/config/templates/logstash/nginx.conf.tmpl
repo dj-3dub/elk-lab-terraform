@@ -22,5 +22,4 @@ output {
     index    => "nginx-access-%%{+YYYY.MM.dd}"
     pipeline => "nginx_access_enrich"
   }
-  stdout { codec => rubydebug }
 }

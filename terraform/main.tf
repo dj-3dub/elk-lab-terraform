@@ -16,6 +16,7 @@ module "docker_elk" {
   count  = var.deploy_containers ? 1 : 0
 
   project_name           = var.project_name
+  domain                 = var.domain
   stack_version          = var.stack_version
   elastic_password       = var.elastic_password
   kibana_system_password = var.kibana_system_password

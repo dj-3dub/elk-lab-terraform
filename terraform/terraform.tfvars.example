@@ -1,0 +1,15 @@
+project_name = "elk-lab"
+domain       = "elk.lab"
+
+stack_version = "8.15.0"
+
+deploy_containers = false
+
+elastic_password       = "REPLACE_WITH_SECURE_ELASTIC_PASSWORD"
+kibana_system_password = "REPLACE_WITH_SECURE_KIBANA_SYSTEM_PASSWORD"
+
+es_java_opts = "-Xms2g -Xmx2g"
+
+kibana_security_encryption_key  = "REPLACE_WITH_32_PLUS_CHARACTER_SECURITY_KEY"
+kibana_eso_encryption_key       = "REPLACE_WITH_32_PLUS_CHARACTER_ENCRYPTED_SAVED_OBJECTS_KEY"
+kibana_reporting_encryption_key = "REPLACE_WITH_32_PLUS_CHARACTER_REPORTING_KEY"

@@ -24,18 +24,22 @@ variable "es_java_opts" {
   type = string
 }
 
-# NEW: Kibana encryption keys
-variable "kibana_security_encryption_key" {
-  type      = string
-  sensitive = true
+variable "filebeat_path" {
+  type = string
 }
 
-variable "kibana_eso_encryption_key" {
-  type      = string
-  sensitive = true
+variable "metricbeat_path" {
+  type = string
 }
 
-variable "kibana_reporting_encryption_key" {
-  type      = string
-  sensitive = true
+variable "logstash_path" {
+  type = string
+}
+
+variable "caddyfile_path" {
+  type = string
+}
+
+variable "kibana_config_path" {
+  type = string
 }

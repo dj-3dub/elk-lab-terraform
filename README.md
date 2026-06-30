@@ -1,191 +1,103 @@
-<h1 align="center">ELK Lab on Docker with Terraform (.lab)</h1>
+# Terraform-Managed ELK Observability Platform
+
 <p align="center">
   <img src="https://img.shields.io/badge/IaC-Terraform-623CE4?logo=terraform&logoColor=white" />
   <img src="https://img.shields.io/badge/Containers-Docker-2496ED?logo=docker&logoColor=white" />
-  <img src="https://img.shields.io/badge/Stack-ELK-005571?logo=elastic&logoColor=white" />
-  <img src="https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?logo=githubactions&logoColor=white" />
-  <img src="https://img.shields.io/badge/OS-Debian-A81D33?logo=debian&logoColor=white" />
+  <img src="https://img.shields.io/badge/Observability-ELK-005571?logo=elastic&logoColor=white" />
+  <img src="https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white" />
+  <img src="https://img.shields.io/badge/Security-Checkov-green" />
 </p>
 
-<p align="center"><b>Production-inspired observability lab built with Terraform, Docker, Elasticsearch, Kibana, Logstash, Filebeat, and Metricbeat.</b></p>
+## Overview
+
+This project demonstrates the deployment and operation of a centralized observability platform using Terraform, Docker, Elasticsearch, Logstash, Kibana, Filebeat, and Metricbeat.
+
+The platform is managed entirely through Infrastructure as Code (IaC) and incorporates configuration templating, automated validation, security scanning, health monitoring, operational runbooks, and CI/CD workflows commonly found in modern Platform Engineering, Site Reliability Engineering (SRE), and Infrastructure Engineering environments.
+
+The objective of this project is to demonstrate how observability platforms can be provisioned, maintained, and operated using repeatable and automated engineering practices.
 
 ---
 
-# Overview
+## Technical Skills Demonstrated
 
-This project demonstrates how to deploy and operate a complete ELK observability stack using Infrastructure as Code principles.
+### Infrastructure as Code
 
-Key concepts demonstrated:
+* Terraform module design
+* Terraform variables, outputs, and state management
+* Environment-specific configuration rendering
+* Automated infrastructure validation
 
-- Terraform Infrastructure as Code
-- Modular Terraform design
-- Docker container orchestration
-- Centralized logging and ingestion
-- Infrastructure monitoring with Metricbeat
-- GitHub Actions CI/CD
-- TFLint static analysis
-- Checkov security scanning
-- Docker health checks
-- Architecture documentation
-- Operational runbooks
-- Demo log generation
+### Platform Engineering
 
----
+* Docker container lifecycle management
+* Service dependency management
+* Infrastructure automation
+* Configuration management
 
-# Project Highlights
+### Observability
 
-✅ Terraform Infrastructure as Code
+* Centralized log aggregation
+* Log enrichment and parsing
+* Infrastructure monitoring
+* Application telemetry collection
+* Search and analytics workflows
 
-✅ Modular Terraform modules
+### Security and Compliance
 
-✅ Elasticsearch, Kibana, Logstash, Filebeat, and Metricbeat
+* Sensitive variable handling
+* Security-focused configuration management
+* Automated infrastructure scanning with Checkov
+* Static analysis using TFLint
 
-✅ GitHub Actions CI pipeline
+### Operations
 
-✅ Terraform validation and formatting enforcement
-
-✅ TFLint static analysis
-
-✅ Checkov security scanning
-
-✅ Docker container health checks
-
-✅ Log enrichment with GeoIP and User-Agent processing
-
-✅ Runbook-driven operations
-
-✅ Architecture diagrams
-
-✅ Demo data generation tooling
+* Health monitoring
+* Operational runbooks
+* Troubleshooting procedures
+* Infrastructure documentation
 
 ---
 
-# Quick Start
-
-```bash
-cp terraform.tfvars.example terraform.tfvars
-
-# Update passwords and environment settings
-nano terraform.tfvars
-
-terraform init
-terraform plan
-terraform apply
-```
-
-Access Kibana:
-
-```text
-http://<server-ip>:5601
-```
-
----
-
-# Architecture
+## Architecture
 
 <p align="center">
-  <img src="docs/architecture.png" width="850" alt="Architecture Diagram"/>
+  <img src="docs/architecture.png" width="900" alt="Architecture Diagram">
 </p>
 
-The stack consists of:
+### Platform Components
 
-| Component | Purpose |
-|------------|----------|
-| Elasticsearch | Search, indexing, and storage |
-| Kibana | Visualization and analytics |
-| Logstash | Parsing and enrichment |
-| Filebeat | Log collection |
-| Metricbeat | Infrastructure metrics |
-| Terraform | Infrastructure provisioning |
-| Docker | Container runtime |
-
----
-
-# Screenshots
-
-## Kibana Dashboard
-
-![Kibana Dashboard](docs/screenshots/kibana-dashboard.png)
-
-## Kibana Discover
-
-![Kibana Discover](docs/screenshots/kibana-discover.png)
-
-## Metricbeat Host Metrics
-
-![Metricbeat Host Metrics](docs/screenshots/metricbeat-host-overview.png)
-
-## Container Health Monitoring
-
-![Container Health](docs/screenshots/docker-healthy-containers.png)
+| Component      | Purpose                                                 |
+| -------------- | ------------------------------------------------------- |
+| Terraform      | Infrastructure provisioning and configuration rendering |
+| Docker         | Container runtime platform                              |
+| Elasticsearch  | Log and metrics storage, indexing, and search           |
+| Kibana         | Visualization and analytics                             |
+| Logstash       | Log ingestion, parsing, and enrichment                  |
+| Filebeat       | Log collection and forwarding                           |
+| Metricbeat     | Infrastructure and container metrics                    |
+| GitHub Actions | Continuous integration and validation                   |
 
 ---
 
-# CI/CD
+## Deployment Workflow
 
-GitHub Actions automatically validates infrastructure changes.
-
-Validation pipeline includes:
-
-- terraform fmt
-- terraform validate
-- TFLint
-- Checkov security scanning
-
-This helps prevent configuration drift and catches issues before deployment.
+1. Terraform renders environment-specific configuration files.
+2. Terraform provisions Docker networks, volumes, images, and containers.
+3. Filebeat collects Docker and host logs.
+4. Logstash processes and enriches incoming log events.
+5. Elasticsearch indexes logs and metrics.
+6. Metricbeat collects host and container telemetry.
+7. Kibana provides visualization, search, dashboards, and analysis.
+8. GitHub Actions validates infrastructure changes through automated checks.
 
 ---
 
-# Security
-
-Security-focused improvements include:
-
-- Sensitive Terraform variables
-- No production secrets committed to Git
-- Example tfvars template
-- Checkov security scanning
-- Health monitoring
-- Docker network isolation
-
-For production environments, API keys should be preferred over passwords where possible.
-
----
-
-# Demo Log Generation
-
-Generate realistic web access logs:
-
-```bash
-./scripts/generate-nginx-logs.sh
-```
-
-The generated logs can be ingested into Logstash and visualized through Kibana dashboards.
-
----
-
-# Operations Runbooks
-
-Operational documentation is provided under:
-
-```text
-docs/runbooks/troubleshooting.md
-```
-
-Covered scenarios include:
-
-- Kibana unavailable
-- Elasticsearch health issues
-- Log ingestion failures
-- Password rotation
-- Full stack rebuild procedures
-
----
-
-# Repository Layout
+## Repository Structure
 
 ```text
 .
-├── .github/workflows/
+├── .github/
+│   └── workflows/
 ├── docs/
 │   ├── architecture.*
 │   ├── runbooks/
@@ -194,45 +106,174 @@ Covered scenarios include:
 │   ├── config/
 │   └── docker-elk/
 ├── scripts/
-├── terraform.tfvars.example
 ├── main.tf
 ├── variables.tf
-└── outputs.tf
+├── outputs.tf
+├── terraform.tfvars.example
+└── README.md
 ```
 
 ---
 
-# Troubleshooting
+## Deployment
 
-Check container status:
+### Prerequisites
+
+* Terraform 1.6+
+* Docker Engine
+* Git
+
+### Clone Repository
 
 ```bash
-docker ps
+git clone https://github.com/dj-3dub/elk-lab-terraform.git
+cd elk-lab-terraform
 ```
 
-Check Elasticsearch health:
+### Configure Variables
 
 ```bash
-curl http://localhost:9200/_cluster/health
+cp terraform.tfvars.example terraform.tfvars
 ```
 
-Check Kibana:
+Update:
+
+* Elastic credentials
+* Kibana encryption keys
+* Domain name
+* Environment settings
+
+### Initialize Terraform
 
 ```bash
-curl http://localhost:5601/api/status
+terraform init
 ```
 
-Review container logs:
+### Validate Configuration
 
 ```bash
-docker logs elasticsearch
-docker logs kibana
-docker logs logstash
+terraform fmt -recursive
+terraform validate
+```
+
+### Review Deployment Plan
+
+```bash
+terraform plan
+```
+
+### Deploy Platform
+
+```bash
+terraform apply
 ```
 
 ---
 
-# Cleanup
+## Accessing the Platform
+
+Terraform outputs provide access URLs:
+
+```bash
+terraform output
+```
+
+Example:
+
+```text
+http://elk.lab:5601
+https://elk.lab
+```
+
+---
+
+## Continuous Integration
+
+Infrastructure changes are automatically validated through GitHub Actions.
+
+Validation pipeline:
+
+* Terraform formatting checks
+* Terraform validation
+* TFLint static analysis
+* Checkov security scanning
+
+This process helps identify configuration issues before deployment.
+
+---
+
+## Security Considerations
+
+The project incorporates several security-focused practices:
+
+* Sensitive Terraform variables
+* Environment-specific configuration rendering
+* No production credentials stored in source control
+* Automated infrastructure scanning
+* Docker network isolation
+* Kibana encryption key management
+
+For production environments, API-based authentication and certificate management should be implemented.
+
+---
+
+## Demonstration Data
+
+Sample log traffic can be generated using:
+
+```bash
+./scripts/generate-nginx-logs.sh
+```
+
+This allows testing of:
+
+* Log ingestion
+* Parsing
+* Enrichment
+* Dashboard creation
+* Search workflows
+
+---
+
+## Screenshots
+
+### Kibana Dashboard
+
+![Kibana Dashboard](docs/screenshots/kibana-dashboard.png)
+
+### Kibana Discover
+
+![Kibana Discover](docs/screenshots/kibana-discover.png)
+
+### Metricbeat Host Overview
+
+![Metricbeat Host Overview](docs/screenshots/metricbeat-host-overview.png)
+
+### Container Health Monitoring
+
+![Container Health Monitoring](docs/screenshots/docker-healthy-containers.png)
+
+---
+
+## Operations Runbook
+
+Operational procedures are documented in:
+
+```text
+docs/runbooks/troubleshooting.md
+```
+
+Documented scenarios include:
+
+* Elasticsearch health validation
+* Kibana troubleshooting
+* Log ingestion failures
+* Credential updates
+* Platform rebuild procedures
+
+---
+
+## Cleanup
 
 ```bash
 terraform destroy
@@ -240,17 +281,30 @@ terraform destroy
 
 ---
 
-# Future Enhancements
+## Engineering Considerations
 
-Potential future improvements:
+This project was intentionally designed as a single-node observability platform to demonstrate infrastructure provisioning, centralized logging, monitoring, configuration management, and operational support workflows.
 
-- TLS-enabled deployment
-- API-key authentication
-- Kubernetes deployment option
-- Elasticsearch snapshot automation
-- Alerting integrations
-- Grafana integration
+The architecture can be extended to support:
+
+* Multi-node Elasticsearch clusters
+* TLS certificate management
+* API-key authentication
+* Kubernetes-based deployments
+* Snapshot and backup automation
+* Alerting and incident response integrations
 
 ---
 
-Built as a portfolio project to demonstrate modern Infrastructure Engineering, Platform Engineering, and Observability practices.
+## License
+
+This project is licensed under the terms of the LICENSE file included in this repository.
+
+---
+
+## Author
+
+Timothy Heverin
+
+Infrastructure Engineering | Platform Engineering | Observability | Automation | Terraform | Linux | Cloud
+
